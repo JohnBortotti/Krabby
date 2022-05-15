@@ -24,7 +24,12 @@ pub mod md_parser;
 
 fn main() {
     // let args = get_command_args();
-    md_parser::parse_string(" # Title Só testando ## mano");
+    md_parser::parse_string(
+        "# Title Só testando 
+        ## mano
+        ### aqui
+        ",
+    );
     // execute_command(&args[1], &args).unwrap();
 }
 
