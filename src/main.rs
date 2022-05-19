@@ -5,26 +5,13 @@ use std::process;
 
 pub mod md_parser;
 
-// Aqui será a entrada do role, sera o cli que vai receber e executar os commands
-
-// [x] Pegar o argumentos do processo
-// [x] Validar argumento
-
-// [] Comando para criar o blog -> vai criar uma pasta com os arquivos iniciais
-//    [x] Criar diretório
-//    [x] Criar arquivo template index.html
-//    [] Criar arquivo de configuração -> definir o formato
-//    [x] Criar diretorio posts
-//    [x] Criar arquivo template post.html
-//    [] Criar diretorio a partir do diretorio de execução do script
-
-// [x] definir o formato de arquivo para o post => MARKDOWN meu parsero
-// [x] construir um esboço do parser de markdown
-
+// [] executar os commands a partir do diretorio de execução do script
 // [] comando help -> listar as paradas pro usuario, como usar, etc.
-// [] comando build -> vai buildar as paradas, substituir variaveis, formatar blocos de código, e TALVEZ markdown, e TALVEZ algum cache
-//   [x] substiruir variaveis no arquivo build/index
-//   [] pegar o markdown processado, e concatenar dentro do html
+// [] implementar sistema de cache na função build
+// [] implementar code highlight nos posts
+// [] melhorar organização e qualidade do code
+// [] escrever testes
+// [] deixar o cli mais agradavel
 // [] comando novo post -> vai gerar um novo arquivo de markdown de acordo com o arquivo de template
 
 fn main() {
@@ -67,6 +54,7 @@ fn new(project_path: &String) -> Result<(), std::io::Error> {
     fs::create_dir_all(project_path)?;
     fs::create_dir(format!("{}/posts/", project_path))?;
     fs::create_dir(format!("{}/build/", project_path))?;
+    fs::create_dir(format!("{}/build/posts", project_path))?;
 
     let template_dir = fs::read_dir("template")?;
 
@@ -126,8 +114,27 @@ fn build(project_path: &String) -> Result<(), std::io::Error> {
     fs::write(
         format!("{}/build/index.html", &project_path),
         index_file_content,
-    )
-    .unwrap();
+    )?;
+
+    let posts_files = fs::read_dir(format!("{}/posts", project_path))?;
+    for post in posts_files {
+        let post = post?;
+        let md_content = fs::read_to_string(&post.path())?;
+
+        // [] tratar essa gambiarra aqui (sem esses replace pf né)
+        let post_build_path = format!("{}/build/posts/{:?}", project_path, post.file_name())
+            .replace('"', "")
+            .replace(".md", ".html");
+
+        let html_template = fs::read_to_string(format!("{}/post-template.html", project_path))?;
+
+        let builded_post = html_template.replace(
+            "<md-content>",
+            &md_parser::parse_string(&md_content).to_string(),
+        );
+
+        fs::write(post_build_path, builded_post)?;
+    }
 
     Ok(())
 }

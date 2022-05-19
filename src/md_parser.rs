@@ -109,8 +109,6 @@ impl Scanner {
         self.overwrite_tags("##", "<h2>", "</h2>");
         self.overwrite_tags("###", "<h3>", "</h3>");
         self.overwrite_tags("\n", "<br>", "br>");
-
-        println!("a sentenca final foi: {:?}", self.get_result_string());
     }
 }
 
