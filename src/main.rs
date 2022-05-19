@@ -8,8 +8,7 @@ pub mod md_parser;
 // [] executar os commands a partir do diretorio de execução do script
 // [] comando help -> listar as paradas pro usuario, como usar, etc.
 // [] implementar sistema de cache na função build
-// [] implementar code highlight nos posts
-// [] melhorar organização e qualidade do code
+// [] melhorar organização e qualidade do code (principalmente do parser maluco)
 // [] escrever testes
 // [] deixar o cli mais agradavel
 // [] comando novo post -> vai gerar um novo arquivo de markdown de acordo com o arquivo de template

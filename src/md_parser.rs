@@ -58,9 +58,17 @@ impl Scanner {
         result.into_iter().collect()
     }
 
-    pub fn overwrite_tags(&mut self, chars: &str, open_tag: &str, close_tag: &str) {
+    pub fn overwrite_tags(
+        &mut self,
+        chars: &str,
+        open_tag: &str,
+        close_tag: &str,
+        inline_tag: bool,
+    ) {
         self.cursor = 0;
         let mut success = 0;
+        let mut is_inline_open: bool = false;
+
         let token_length = chars.chars().count();
         loop {
             if self.cursor > 0 && self.is_done() {
@@ -73,12 +81,18 @@ impl Scanner {
                         if &char == self.characters.get(self.cursor).unwrap() {
                             success += 1;
                             self.pop();
-                            if success == token_length
-                                && self.characters.get(self.cursor).unwrap() == &' '
-                            {
-                                self.overwrite(chars.len(), open_tag);
-                                self.open_tags.push(String::from(close_tag));
-                                success = 0;
+                            if success == token_length {
+                                if inline_tag == false {
+                                    self.overwrite(chars.len(), open_tag);
+                                    self.open_tags.push(String::from(close_tag));
+                                    success = 0;
+                                } else if inline_tag == true && is_inline_open == false {
+                                    is_inline_open = true;
+                                    self.overwrite(chars.len(), open_tag);
+                                } else if inline_tag == true && is_inline_open == true {
+                                    is_inline_open = false;
+                                    self.overwrite(chars.len(), close_tag);
+                                }
                             }
                         } else {
                             if self.is_done() {
@@ -105,10 +119,14 @@ impl Scanner {
     }
 
     pub fn scan_chars(&mut self) {
-        self.overwrite_tags("#", "<h1>", "</h1>");
-        self.overwrite_tags("##", "<h2>", "</h2>");
-        self.overwrite_tags("###", "<h3>", "</h3>");
-        self.overwrite_tags("\n", "<br>", "br>");
+        self.overwrite_tags("###", "<h3>", "</h3>", false);
+        self.overwrite_tags("##", "<h2>", "</h2>", false);
+        self.overwrite_tags("#", "<h1>", "</h1>", false);
+        self.overwrite_tags("```", "<pre><code>", "</code></pre>", true);
+        self.overwrite_tags("***", "<strong>", "</strong>", true);
+        self.overwrite_tags("*", "<em>", "</em>", true);
+        self.overwrite_tags("\n\n", "<br>", "", false);
+        self.overwrite_tags("\n", "\n", "\n", false);
     }
 }
 
