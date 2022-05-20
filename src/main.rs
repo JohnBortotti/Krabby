@@ -155,7 +155,7 @@ fn post(project_path: &String, post_title: &String) -> Result<(), std::io::Error
 fn help() -> Result<(), std::io::Error> {
     print!(
         "
-------- Rust-ssg Help ------ 
+------- Rust-sbg Help ------ 
 
 new [project_path]    -> creates a new Rust-ssg project
 build [project_path]  -> build all files to '/build'
