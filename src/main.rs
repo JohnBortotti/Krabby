@@ -4,12 +4,11 @@ use std::fs;
 use std::process;
 
 pub mod md_parser;
+pub mod utils;
 
-// [] executar os commands a partir do diretorio de execução do script
 // [] implementar sistema de cache na função build
 // [] criar lista -> melhorar organização e qualidade do code (principalmente do parser maluco)
 // [] escrever testes
-// [] adicionar readme
 // [] deixar o cli mais agradavel
 
 fn main() {
@@ -31,15 +30,9 @@ fn get_command_args() -> Vec<String> {
 
 fn execute_command(command: &String, args: &Vec<String>) -> Result<(), std::io::Error> {
     match command.to_lowercase().as_str() {
-        "new" => match &args.len() {
-            3 => new(&args[2]),
-            _ => {
-                print!("Error: Invalid arguments. Use 'new [path]'");
-                process::exit(1)
-            }
-        },
+        "new" => new(),
         "help" => help(),
-        "build" => build(&args[2]),
+        "build" => build(),
         "post" => post(&args[2], &args[3]),
         _ => {
             println!("Error: Invalid Command");
@@ -48,20 +41,34 @@ fn execute_command(command: &String, args: &Vec<String>) -> Result<(), std::io::
     }
 }
 
-fn new(project_path: &String) -> Result<(), std::io::Error> {
-    fs::create_dir_all(project_path)?;
-    fs::create_dir(format!("{}/posts/", project_path))?;
-    fs::create_dir(format!("{}/build/", project_path))?;
-    fs::create_dir(format!("{}/build/posts", project_path))?;
+fn new() -> Result<(), std::io::Error> {
+    let mut project_path = utils::path_from_string("blog");
 
-    let template_dir = fs::read_dir("template")?;
+    fs::create_dir_all(&project_path)?;
+
+    project_path.push("posts");
+    fs::create_dir(&project_path)?;
+
+    project_path.pop();
+    project_path.push("build");
+    fs::create_dir(&project_path)?;
+
+    project_path.push("posts");
+    fs::create_dir(&project_path)?;
+
+    project_path.pop();
+    project_path.pop();
+
+    let template_dir = fs::read_dir("./template")?;
 
     for file in template_dir {
         let file = file.unwrap();
-        fs::copy(
-            &file.path(),
-            format!("{}/{}", project_path, &file.file_name().to_str().unwrap()),
-        )?;
+
+        project_path.push(file.file_name().to_str().unwrap());
+
+        fs::copy(&file.path(), &project_path)?;
+
+        project_path.pop();
     }
 
     Ok(())
@@ -78,13 +85,14 @@ impl Replace {
     }
 }
 
-fn build(project_path: &String) -> Result<(), std::io::Error> {
+fn build() -> Result<(), std::io::Error> {
     let mut index_file_content =
-        fs::read_to_string(format!("{}/index-template.html", project_path))?;
+        fs::read_to_string(utils::path_from_string(&"blog/index-template.html"))?;
 
     let re: Regex = Regex::new(r"\{\{+\s?[A-Za-z-]+\s?\}\}").unwrap();
 
-    let config_file_content = fs::read_to_string(format!("{}/config.json", project_path))?;
+    let config_file_content = fs::read_to_string(utils::path_from_string(&"blog/config.json"))?;
+
     let configs = json::parse(&config_file_content).unwrap();
 
     let mut replaces: Vec<Replace> = Vec::new();
@@ -110,28 +118,29 @@ fn build(project_path: &String) -> Result<(), std::io::Error> {
     }
 
     fs::write(
-        format!("{}/build/index.html", &project_path),
+        utils::path_from_string(&"blog/build/index.html"),
         index_file_content,
     )?;
 
-    let posts_files = fs::read_dir(format!("{}/posts", project_path))?;
+    let posts_files = fs::read_dir(utils::path_from_string(&"blog/posts/"))?;
+
     for post in posts_files {
         let post = post?;
         let md_content = fs::read_to_string(&post.path())?;
 
-        // [] tratar essa gambiarra aqui (sem esses replace pf né)
-        let post_build_path = format!("{}/build/posts/{:?}", project_path, post.file_name())
-            .replace('"', "")
-            .replace(".md", ".html");
+        let html_post_template =
+            fs::read_to_string(utils::path_from_string(&"blog/post-template.html"))?;
 
-        let html_template = fs::read_to_string(format!("{}/post-template.html", project_path))?;
-
-        let builded_post = html_template.replace(
+        let builded_post = html_post_template.replace(
             "<md-content>",
             &md_parser::parse_string(&md_content).to_string(),
         );
 
-        fs::write(post_build_path, builded_post)?;
+        let mut builded_post_path = utils::path_from_string("blog/build/posts");
+        builded_post_path.push(post.file_name());
+        builded_post_path.set_extension("html");
+
+        fs::write(builded_post_path, builded_post)?;
     }
 
     Ok(())
@@ -157,8 +166,8 @@ fn help() -> Result<(), std::io::Error> {
         "
 ------- Rust-sbg Help ------ 
 
-new [project_path]    -> creates a new Rust-ssg project
-build [project_path]  -> build all files to '/build'
+new                   -> creates a new Rust-ssg project blog
+build                 -> build all files to '/build'
 post [post_title]     -> creates a new post file on '/posts'
 help                  -> show this help
 
