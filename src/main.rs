@@ -8,10 +8,10 @@ pub mod md_parser;
 // [] executar os commands a partir do diretorio de execução do script
 // [] comando help -> listar as paradas pro usuario, como usar, etc.
 // [] implementar sistema de cache na função build
-// [] melhorar organização e qualidade do code (principalmente do parser maluco)
+// [] criar lista -> melhorar organização e qualidade do code (principalmente do parser maluco)
 // [] escrever testes
 // [] deixar o cli mais agradavel
-// [] comando novo post -> vai gerar um novo arquivo de markdown de acordo com o arquivo de template
+// [x] comando novo post -> vai gerar um novo arquivo de markdown de acordo com o arquivo de template
 
 fn main() {
     let args = get_command_args();
@@ -41,7 +41,7 @@ fn execute_command(command: &String, args: &Vec<String>) -> Result<(), std::io::
         },
         // "help" => String::from("help"),
         "build" => build(&args[2]),
-        // "post" => String::from("post"),
+        "post" => post(&args[2], &args[3]),
         _ => {
             println!("Error: Invalid Command");
             process::exit(1)
@@ -135,5 +135,20 @@ fn build(project_path: &String) -> Result<(), std::io::Error> {
         fs::write(post_build_path, builded_post)?;
     }
 
+    Ok(())
+}
+
+fn post(project_path: &String, post_title: &String) -> Result<(), std::io::Error> {
+    let md_content = String::from(
+        "# New post
+```
+() => console.log('New post');
+```
+",
+    );
+    fs::write(
+        format!("{}/posts/{}.md", project_path, post_title),
+        md_content,
+    )?;
     Ok(())
 }
