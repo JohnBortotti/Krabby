@@ -6,12 +6,10 @@ use std::process;
 pub mod md_parser;
 
 // [] executar os commands a partir do diretorio de execução do script
-// [] comando help -> listar as paradas pro usuario, como usar, etc.
 // [] implementar sistema de cache na função build
 // [] criar lista -> melhorar organização e qualidade do code (principalmente do parser maluco)
 // [] escrever testes
 // [] deixar o cli mais agradavel
-// [x] comando novo post -> vai gerar um novo arquivo de markdown de acordo com o arquivo de template
 
 fn main() {
     let args = get_command_args();
@@ -39,7 +37,7 @@ fn execute_command(command: &String, args: &Vec<String>) -> Result<(), std::io::
                 process::exit(1)
             }
         },
-        // "help" => String::from("help"),
+        "help" => help(),
         "build" => build(&args[2]),
         "post" => post(&args[2], &args[3]),
         _ => {
@@ -150,5 +148,23 @@ fn post(project_path: &String, post_title: &String) -> Result<(), std::io::Error
         format!("{}/posts/{}.md", project_path, post_title),
         md_content,
     )?;
+    Ok(())
+}
+
+fn help() -> Result<(), std::io::Error> {
+    print!(
+        "
+------- Rust-ssg Help ------ 
+
+new [project_path]    -> creates a new Rust-ssg project
+build [project_path]  -> build all files to '/build'
+post [post_title]     -> creates a new post file on '/posts'
+help                  -> show this help
+
+----------------------------
+
+"
+    );
+
     Ok(())
 }
