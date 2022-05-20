@@ -9,6 +9,7 @@ pub mod md_parser;
 // [] implementar sistema de cache na função build
 // [] criar lista -> melhorar organização e qualidade do code (principalmente do parser maluco)
 // [] escrever testes
+// [] adicionar readme
 // [] deixar o cli mais agradavel
 
 fn main() {
@@ -161,6 +162,7 @@ build [project_path]  -> build all files to '/build'
 post [post_title]     -> creates a new post file on '/posts'
 help                  -> show this help
 
+for more info         -> https://github.com/JohnBortotti/ssg-rust
 ----------------------------
 
 "
