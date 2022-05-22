@@ -9,11 +9,10 @@ pub mod utils;
 // [] implementar sistema de cache na função build
 // [] criar lista -> melhorar organização e qualidade do code (principalmente do parser maluco)
 // [] escrever testes
-// [] deixar o cli mais agradavel
 
 fn main() {
     let args = get_command_args();
-    execute_command(&args[1], &args).unwrap();
+    execute_command(&args[1]).unwrap();
 }
 
 fn get_command_args() -> Vec<String> {
@@ -22,20 +21,19 @@ fn get_command_args() -> Vec<String> {
     return match args.get(1) {
         Some(_) => args,
         _ => {
-            println!("Error: Invalid Command");
+            println!("Error: Invalid Command, please use help \n");
             process::exit(1)
         }
     };
 }
 
-fn execute_command(command: &String, args: &Vec<String>) -> Result<(), std::io::Error> {
+fn execute_command(command: &String) -> Result<(), std::io::Error> {
     match command.to_lowercase().as_str() {
         "new" => new(),
         "help" => help(),
         "build" => build(),
-        "post" => post(&args[2], &args[3]),
         _ => {
-            println!("Error: Invalid Command");
+            println!("Error: Invalid Command, please use help \n");
             process::exit(1)
         }
     }
@@ -146,21 +144,6 @@ fn build() -> Result<(), std::io::Error> {
     Ok(())
 }
 
-fn post(project_path: &String, post_title: &String) -> Result<(), std::io::Error> {
-    let md_content = String::from(
-        "# New post
-```
-() => console.log('New post');
-```
-",
-    );
-    fs::write(
-        format!("{}/posts/{}.md", project_path, post_title),
-        md_content,
-    )?;
-    Ok(())
-}
-
 fn help() -> Result<(), std::io::Error> {
     print!(
         "
@@ -168,7 +151,6 @@ fn help() -> Result<(), std::io::Error> {
 
 new                   -> creates a new Rust-ssg project blog
 build                 -> build all files to '/build'
-post [post_title]     -> creates a new post file on '/posts'
 help                  -> show this help
 
 for more info         -> https://github.com/JohnBortotti/ssg-rust
