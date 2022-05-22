@@ -137,3 +137,44 @@ pub fn parse_string(string: &str) -> String {
     scanner.scan_chars();
     scanner.get_result_string()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::md_parser;
+
+    #[test]
+    fn should_return_cursor() {
+        let mut scanner = Scanner::new("any");
+        scanner.cursor += 3;
+        assert_eq!(scanner.cursor(), 3);
+    }
+
+    #[test]
+    fn should_peek_char() {
+        let scanner = Scanner::new("hello world");
+        assert_eq!(scanner.peek().unwrap(), &'h');
+    }
+
+    #[test]
+    fn should_pop_next_char() {
+        let mut scanner = Scanner::new("rust");
+        assert_eq!(scanner.pop().unwrap(), &'r');
+    }
+
+    #[test]
+    fn should_overwrite_correctly() {
+        let mut scanner = Scanner::new("rust");
+        scanner.overwrite(0, "javascript");
+        assert_eq!(scanner.pop().unwrap(), &'j');
+    }
+
+    #[test]
+    fn should_parse_md_correcly() {
+        let parsed = md_parser::parse_string(
+            "# Title
+  ",
+        );
+        assert_eq!(parsed, "<h1> Title</h1>\n  ");
+    }
+}

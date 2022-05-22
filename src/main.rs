@@ -8,7 +8,7 @@ pub mod utils;
 
 // [] implementar sistema de cache na função build
 // [] criar lista -> melhorar organização e qualidade do code (principalmente do parser maluco)
-// [] escrever testes
+// [] ajustar os templates para subir o blog
 
 fn main() {
     let args = get_command_args();
