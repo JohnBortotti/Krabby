@@ -119,6 +119,7 @@ impl Scanner {
     }
 
     pub fn scan_chars(&mut self) {
+        self.overwrite_tags("####", "<h4>", "</h4>", false);
         self.overwrite_tags("###", "<h3>", "</h3>", false);
         self.overwrite_tags("##", "<h2>", "</h2>", false);
         self.overwrite_tags("#", "<h1>", "</h1>", false);
