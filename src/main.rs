@@ -9,7 +9,11 @@ pub mod utils;
 // [] implementar sistema de cache na função build
 // [] criar lista -> melhorar organização e qualidade do code (principalmente do parser maluco)
 // [] ajustar os templates para subir o blog
-
+// [] definir uma forma de cabecalho com infos para os posts (dentro do arquivo md)
+// [] colocar no index-template.html a tag para dar replace com os posts
+// [] adicionar tags de SEO nos teplates html
+// [] adicionar sistema de paginacao dos posts
+ 
 fn main() {
     let args = get_command_args();
     execute_command(&args[1]).unwrap();
