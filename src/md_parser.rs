@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+use std::fs::File;
 use std::str;
 
 pub struct Scanner {
@@ -136,6 +138,27 @@ pub fn parse_string(string: &str) -> String {
 
     scanner.scan_chars();
     scanner.get_result_string()
+}
+
+pub fn extract_meta(input: &str) -> HashMap<&str, &str> {
+    let mut meta = HashMap::new();
+    let mut _enabled: bool = false;
+
+    for line in input.lines() {
+        if line == "---" {
+            if _enabled == false {
+                _enabled = true;
+                continue;
+            } else {
+                break;
+            }
+        } else {
+            let strings: Vec<&str> = line.split(":").collect();
+            meta.insert(strings[0].trim(), strings[1].trim());
+        }
+    }
+
+    meta
 }
 
 #[cfg(test)]
