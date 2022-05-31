@@ -11,7 +11,7 @@ pub mod utils;
 // [] ajustar o css dos templates
 // [] ao fazer o build, pegar todos os posts e plotar no index com a paginação (criar cabeçalho com infos no markdown)
 // -------------
-
+ 
 fn main() {
     let args = get_command_args();
     execute_command(&args[1]).unwrap();
