@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::fs::File;
 use std::str;
 
 pub struct Scanner {
@@ -17,13 +16,13 @@ impl Scanner {
         }
     }
 
-    pub fn cursor(&self) -> usize {
-        self.cursor
-    }
-
-    pub fn peek(&self) -> Option<&char> {
-        self.characters.get(self.cursor)
-    }
+    // pub fn cursor(&self) -> usize {
+    //     self.cursor
+    // }
+    //
+    // pub fn peek(&self) -> Option<&char> {
+    //     self.characters.get(self.cursor)
+    // }
 
     pub fn is_done(&self) -> bool {
         self.cursor == self.characters.len() - 2
@@ -50,11 +49,11 @@ impl Scanner {
             .splice(start_offset..self.cursor, string.chars());
     }
 
-    pub fn copy(&mut self) {
-        self.characters
-            .push(self.characters.get(self.cursor).copied().unwrap())
-    }
-
+    // pub fn copy(&mut self) {
+    //     self.characters
+    //         .push(self.characters.get(self.cursor).copied().unwrap())
+    // }
+    //
     pub fn get_result_string(&mut self) -> String {
         let result = &self.characters;
         result.into_iter().collect()
@@ -145,13 +144,10 @@ pub fn extract_meta(input: &str) -> HashMap<&str, &str> {
     let mut _enabled: bool = false;
 
     for line in input.lines() {
-        if line == "---" {
-            if _enabled == false {
-                _enabled = true;
-                continue;
-            } else {
-                break;
-            }
+        if line == "<!-- md-meta" {
+            _enabled = true;
+        } else if line == "-->" {
+            return meta;
         } else {
             let strings: Vec<&str> = line.split(":").collect();
             meta.insert(strings[0].trim(), strings[1].trim());
@@ -161,43 +157,42 @@ pub fn extract_meta(input: &str) -> HashMap<&str, &str> {
     meta
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::md_parser;
-
-    #[test]
-    fn should_return_cursor() {
-        let mut scanner = Scanner::new("any");
-        scanner.cursor += 3;
-        assert_eq!(scanner.cursor(), 3);
-    }
-
-    #[test]
-    fn should_peek_char() {
-        let scanner = Scanner::new("hello world");
-        assert_eq!(scanner.peek().unwrap(), &'h');
-    }
-
-    #[test]
-    fn should_pop_next_char() {
-        let mut scanner = Scanner::new("rust");
-        assert_eq!(scanner.pop().unwrap(), &'r');
-    }
-
-    #[test]
-    fn should_overwrite_correctly() {
-        let mut scanner = Scanner::new("rust");
-        scanner.overwrite(0, "javascript");
-        assert_eq!(scanner.pop().unwrap(), &'j');
-    }
-
-    #[test]
-    fn should_parse_md_correcly() {
-        let parsed = md_parser::parse_string(
-            "# Title
-  ",
-        );
-        assert_eq!(parsed, "<h1> Title</h1>\n  ");
-    }
-}
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+//
+//     #[test]
+//     fn should_return_cursor() {
+//         let mut scanner = Scanner::new("any");
+//         scanner.cursor += 3;
+//         assert_eq!(scanner.cursor(), 3);
+//     }
+//
+//     #[test]
+//     fn should_peek_char() {
+//         let scanner = Scanner::new("hello world");
+//         assert_eq!(scanner.peek().unwrap(), &'h');
+//     }
+//
+//     #[test]
+//     fn should_pop_next_char() {
+//         let mut scanner = Scanner::new("rust");
+//         assert_eq!(scanner.pop().unwrap(), &'r');
+//     }
+//
+//     #[test]
+//     fn should_overwrite_correctly() {
+//         let mut scanner = Scanner::new("rust");
+//         scanner.overwrite(0, "javascript");
+//         assert_eq!(scanner.pop().unwrap(), &'j');
+//     }
+//
+//     #[test]
+//     fn should_parse_md_correcly() {
+//         let parsed = md_parser::parse_string(
+//             "# Title
+//   ",
+//         );
+//         assert_eq!(parsed, "<h1> Title</h1>\n  ");
+//     }
+// }

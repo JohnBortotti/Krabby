@@ -1,4 +1,5 @@
 {
   "blog-name": "Rust SSG",
-  "author": "John Bortotti"
+  "author": "John Bortotti",
+  "theme": "dark.css"
 }
