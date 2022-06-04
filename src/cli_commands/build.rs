@@ -1,12 +1,8 @@
+use super::md_parser;
+use super::utils;
 use regex::Regex;
 use std::collections::HashMap;
 use std::fs;
-
-#[path = "../utils.rs"]
-mod utils;
-
-#[path = "../md_parser.rs"]
-mod md_parser;
 
 struct Replace {
     key: String,
@@ -14,7 +10,7 @@ struct Replace {
 }
 
 impl Replace {
-    pub fn new(key: String, value: String) -> Replace {
+    fn new(key: String, value: String) -> Replace {
         Self { key, value }
     }
 }
@@ -86,7 +82,7 @@ pub fn replace_meta_variables(content: &str, _meta: HashMap<&str, &str>) -> Stri
  * Build index-template and all md posts, replacing variables
  * and translating the markdown content to html
  */
-pub fn build() -> Result<(), std::io::Error> {
+pub fn run_command() -> Result<(), std::io::Error> {
     let index_file_content =
         fs::read_to_string(utils::path_from_string(&"blog/index-template.html"))?;
 

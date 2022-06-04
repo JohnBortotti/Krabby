@@ -1,4 +1,4 @@
-pub fn help() -> Result<(), std::io::Error> {
+pub fn run_command() -> Result<(), std::io::Error> {
     print!(
         "
 ------- Rust-sbg Help ------ 

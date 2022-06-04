@@ -1,14 +1,7 @@
 use std::env;
 use std::process;
 
-#[path = "cli/new.rs"]
-mod new;
-
-#[path = "cli/help.rs"]
-mod help;
-
-#[path = "cli/build.rs"]
-mod build;
+pub mod cli_commands;
 
 fn main() {
     let args = get_command_args();
@@ -29,9 +22,9 @@ fn get_command_args() -> Vec<String> {
 
 fn execute_command(command: &String) -> Result<(), std::io::Error> {
     match command.to_lowercase().as_str() {
-        "new" => new::new(),
-        "help" => help::help(),
-        "build" => build::build(),
+        "new" => cli_commands::new::run_command(),
+        "help" => cli_commands::help::run_command(),
+        "build" => cli_commands::build::run_command(),
         _ => {
             println!("Error: Invalid Command, please use help \n");
             process::exit(1)
