@@ -1,3 +1,138 @@
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+    display: block;
+}
+body {
+    line-height: 1;
+}
+ol, ul {
+    list-style: none;
+}
+blockquote, q {
+    quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+    content: '';
+    content: none;
+}
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+
+/*
+ * CSS for index page
+ */
 html {
-  background-color: black;
+  background-color: #111111;
+  color: white;
+  font-family: sans-serif;
+}
+
+a {
+  text-decoration: none;
+  color: white;
+}
+
+.navbar {
+  display: flex;
+  margin: 0px 10%;
+  justify-content: space-between;
+  align-items: center;
+  height: 95px;
+}
+
+.nav-links {
+  width: 10%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.feed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.post-card {
+  width: 70%;
+  margin: 20px 0px;
+}
+
+.post-title {
+  font-size: 1.6rem;
+  margin: 8px 0px;
+}
+
+.post-date {
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.post-description {
+  color: gray;
+}
+
+/*
+ * CSS For post page
+ */
+.post-content {
+  width: 75%;
+  margin: 20px auto;
+}
+
+.post-content-title {
+  font-size: 1.9rem;
+  margin-bottom: 8px;
+}
+
+.post-content-date {
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+
+.post-content-description {
+  color: gray;
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 0 auto;
+  font-size: 0.9rem;
+  position: fixed;
+  bottom: 25px;
+}
+
+.footer a {
+  color: gray;
 }
