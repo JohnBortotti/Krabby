@@ -15,10 +15,27 @@ impl Replace {
     }
 }
 
+#[derive(Debug)]
+struct BuildedPost {
+    title: String,
+    description: String,
+    date: String,
+}
+
+impl BuildedPost {
+    fn new(title: String, description: String, date: String) -> BuildedPost {
+        Self {
+            title,
+            description,
+            date,
+        }
+    }
+}
+
 /*
  * Replace all text variables with values declared on config.json
  */
-pub fn replace_config_variables(content: &str) -> String {
+fn replace_config_variables(content: &str) -> String {
     let re: Regex = Regex::new(r"\{\{+\s?[A-Za-z-]+\s?\}\}").unwrap();
 
     let config_file_content =
@@ -55,7 +72,7 @@ pub fn replace_config_variables(content: &str) -> String {
 /*
  * Replace all text variables with values declared on post _meta header
  */
-pub fn replace_meta_variables(content: &str, _meta: HashMap<&str, &str>) -> String {
+fn replace_meta_variables(content: &str, _meta: HashMap<&str, &str>) -> String {
     let re: Regex = Regex::new(r"\{\{+\s?[A-Za-z-]+\s?\}\}").unwrap();
     let mut replaces_vec: Vec<Replace> = Vec::new();
 
@@ -79,6 +96,37 @@ pub fn replace_meta_variables(content: &str, _meta: HashMap<&str, &str>) -> Stri
 }
 
 /*
+ * insert into index.html all builded posts (posts feed)
+ */
+fn build_posts_feed(posts: Vec<BuildedPost>) -> Result<(), std::io::Error> {
+    let mut posts_feed_buffer = String::new();
+
+    for post in posts {
+        posts_feed_buffer.push_str(&format!(
+            "<div class='post-card'>
+  <div class='post-title'>{}</div>
+  <div class='post-date'>{}</div>
+  <div class='post-description'>{}</div>
+</div>",
+            post.title, post.description, post.date
+        ));
+        posts_feed_buffer.push_str("\n\n")
+    }
+
+    println!("{}", posts_feed_buffer);
+    let index_file = fs::read_to_string(utils::path_from_string(&"blog/index-template.html"))?;
+
+    let index_with_feed = index_file.replace("<posts-feed>", &posts_feed_buffer);
+
+    fs::write(
+        utils::path_from_string(&"blog/build/index.html"),
+        replace_config_variables(&index_with_feed),
+    )?;
+
+    Ok(())
+}
+
+/*
  * Build index-template and all md posts, replacing variables
  * and translating the markdown content to html
  */
@@ -93,39 +141,49 @@ pub fn run_command() -> Result<(), std::io::Error> {
 
     let posts_files = fs::read_dir(utils::path_from_string(&"blog/posts/"))?;
 
+    let mut posts_feed: Vec<BuildedPost> = Vec::new();
+
     for post in posts_files {
         let post = post?;
 
         let md_content = fs::read_to_string(&post.path())?;
-        let _md_meta = md_parser::extract_meta(&md_content);
+        let md_meta = md_parser::extract_meta(&md_content);
 
-        let _html_post_template =
+        posts_feed.push(BuildedPost::new(
+            md_meta["title"].to_string(),
+            md_meta["description"].to_string(),
+            md_meta["date"].to_string(),
+        ));
+
+        let html_post_template =
             fs::read_to_string(utils::path_from_string(&"blog/post-template.html"))?;
 
-        let _html_with_post_content =
-            _html_post_template.replace("<md-content>", &md_parser::parse_string(&md_content));
+        let html_with_post_content =
+            html_post_template.replace("<md-content>", &md_parser::parse_string(&md_content));
 
-        let mut _builded_post = replace_config_variables(&_html_with_post_content);
-        let mut _builded_post = replace_meta_variables(&_builded_post, _md_meta);
+        let mut builded_post = replace_config_variables(&html_with_post_content);
+        builded_post = replace_meta_variables(&builded_post, md_meta);
 
-        let _configs =
+        let configs =
             json::parse(&fs::read_to_string(utils::path_from_string("blog/config.json")).unwrap())
                 .unwrap();
 
         let mut theme_path = utils::path_from_string("themes/");
-        let _ = &theme_path.push(_configs["theme"].as_str().unwrap());
+        let _ = &theme_path.push(configs["theme"].as_str().unwrap());
         let theme_css = fs::read_to_string(theme_path).unwrap();
 
-        _builded_post.push_str("\n\n<style>");
-        _builded_post.push_str(&theme_css);
-        _builded_post.push_str("\n\n</style>");
+        builded_post.push_str("\n\n<style>");
+        builded_post.push_str(&theme_css);
+        builded_post.push_str("\n\n</style>");
 
         let mut builded_post_path = utils::path_from_string("blog/build/posts");
         builded_post_path.push(post.file_name());
         builded_post_path.set_extension("html");
 
-        fs::write(&builded_post_path, _builded_post)?;
+        fs::write(&builded_post_path, builded_post)?;
     }
+
+    build_posts_feed(posts_feed)?;
 
     Ok(())
 }
