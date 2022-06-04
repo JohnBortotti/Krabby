@@ -16,14 +16,6 @@ impl Scanner {
         }
     }
 
-    // pub fn cursor(&self) -> usize {
-    //     self.cursor
-    // }
-    //
-    // pub fn peek(&self) -> Option<&char> {
-    //     self.characters.get(self.cursor)
-    // }
-
     pub fn is_done(&self) -> bool {
         self.cursor == self.characters.len() - 2
     }
@@ -49,11 +41,6 @@ impl Scanner {
             .splice(start_offset..self.cursor, string.chars());
     }
 
-    // pub fn copy(&mut self) {
-    //     self.characters
-    //         .push(self.characters.get(self.cursor).copied().unwrap())
-    // }
-    //
     pub fn get_result_string(&mut self) -> String {
         let result = &self.characters;
         result.into_iter().collect()

@@ -22,7 +22,6 @@ fn get_command_args() -> Vec<String> {
 
 fn execute_command(command: &String) -> Result<(), std::io::Error> {
     match command.to_lowercase().as_str() {
-        "new" => cli_commands::new::run_command(),
         "help" => cli_commands::help::run_command(),
         "build" => cli_commands::build::run_command(),
         _ => {

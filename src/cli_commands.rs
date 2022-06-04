@@ -1,6 +1,5 @@
 pub mod build;
 pub mod help;
-pub mod new;
 
 #[path = "./utils.rs"]
 pub mod utils;

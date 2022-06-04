@@ -15,19 +15,20 @@ impl Replace {
     }
 }
 
-#[derive(Debug)]
 struct BuildedPost {
     title: String,
     description: String,
     date: String,
+    href: String,
 }
 
 impl BuildedPost {
-    fn new(title: String, description: String, date: String) -> BuildedPost {
+    fn new(title: String, description: String, date: String, href: String) -> BuildedPost {
         Self {
             title,
             description,
             date,
+            href,
         }
     }
 }
@@ -72,7 +73,7 @@ fn replace_config_variables(content: &str) -> String {
 /*
  * Replace all text variables with values declared on post _meta header
  */
-fn replace_meta_variables(content: &str, _meta: HashMap<&str, &str>) -> String {
+fn replace_meta_variables(content: &str, _meta: &HashMap<&str, &str>) -> String {
     let re: Regex = Regex::new(r"\{\{+\s?[A-Za-z-]+\s?\}\}").unwrap();
     let mut replaces_vec: Vec<Replace> = Vec::new();
 
@@ -104,17 +105,18 @@ fn build_posts_feed(posts: Vec<BuildedPost>) -> Result<(), std::io::Error> {
     for post in posts {
         posts_feed_buffer.push_str(&format!(
             "<div class='post-card'>
-  <div class='post-title'>{}</div>
+  <div class='post-title'>
+  <a href={}>{}</a>
+  </div>
   <div class='post-date'>{}</div>
   <div class='post-description'>{}</div>
 </div>",
-            post.title, post.description, post.date
+            post.href, post.title, post.date, post.description
         ));
         posts_feed_buffer.push_str("\n\n")
     }
 
-    println!("{}", posts_feed_buffer);
-    let index_file = fs::read_to_string(utils::path_from_string(&"blog/index-template.html"))?;
+    let index_file = fs::read_to_string(utils::path_from_string(&"blog/build/index.html"))?;
 
     let index_with_feed = index_file.replace("<posts-feed>", &posts_feed_buffer);
 
@@ -131,8 +133,20 @@ fn build_posts_feed(posts: Vec<BuildedPost>) -> Result<(), std::io::Error> {
  * and translating the markdown content to html
  */
 pub fn run_command() -> Result<(), std::io::Error> {
-    let index_file_content =
+    let mut index_file_content =
         fs::read_to_string(utils::path_from_string(&"blog/index-template.html"))?;
+
+    let configs =
+        json::parse(&fs::read_to_string(utils::path_from_string("blog/config.json")).unwrap())
+            .unwrap();
+
+    let mut theme_path = utils::path_from_string("themes/");
+    let _ = &theme_path.push(configs["theme"].as_str().unwrap());
+    let theme_css = fs::read_to_string(theme_path).unwrap();
+
+    index_file_content.push_str("\n\n<style>");
+    index_file_content.push_str(&theme_css);
+    index_file_content.push_str("\n\n</style>");
 
     fs::write(
         utils::path_from_string(&"blog/build/index.html"),
@@ -149,12 +163,6 @@ pub fn run_command() -> Result<(), std::io::Error> {
         let md_content = fs::read_to_string(&post.path())?;
         let md_meta = md_parser::extract_meta(&md_content);
 
-        posts_feed.push(BuildedPost::new(
-            md_meta["title"].to_string(),
-            md_meta["description"].to_string(),
-            md_meta["date"].to_string(),
-        ));
-
         let html_post_template =
             fs::read_to_string(utils::path_from_string(&"blog/post-template.html"))?;
 
@@ -162,7 +170,7 @@ pub fn run_command() -> Result<(), std::io::Error> {
             html_post_template.replace("<md-content>", &md_parser::parse_string(&md_content));
 
         let mut builded_post = replace_config_variables(&html_with_post_content);
-        builded_post = replace_meta_variables(&builded_post, md_meta);
+        builded_post = replace_meta_variables(&builded_post, &md_meta);
 
         let configs =
             json::parse(&fs::read_to_string(utils::path_from_string("blog/config.json")).unwrap())
@@ -181,6 +189,17 @@ pub fn run_command() -> Result<(), std::io::Error> {
         builded_post_path.set_extension("html");
 
         fs::write(&builded_post_path, builded_post)?;
+
+        let mut post_href = utils::path_from_string("posts/");
+        post_href.push(post.file_name());
+        post_href.set_extension("html");
+
+        posts_feed.push(BuildedPost::new(
+            md_meta["title"].to_string(),
+            md_meta["description"].to_string(),
+            md_meta["date"].to_string(),
+            post_href.into_os_string().into_string().unwrap(),
+        ));
     }
 
     build_posts_feed(posts_feed)?;
