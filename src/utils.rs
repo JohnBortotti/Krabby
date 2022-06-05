@@ -1,3 +1,4 @@
+use std::fs;
 use std::path::PathBuf;
 
 pub fn path_from_string(path: &str) -> PathBuf {
@@ -5,6 +6,10 @@ pub fn path_from_string(path: &str) -> PathBuf {
 
     pathbuf.push(path);
     pathbuf
+}
+
+pub fn read_str_from_path(path: &str) -> String {
+    fs::read_to_string(path_from_string(path)).unwrap()
 }
 
 #[cfg(test)]
