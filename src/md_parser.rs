@@ -114,8 +114,8 @@ impl Scanner {
         self.overwrite_tags("```", "<pre><code>", "</code></pre>", true);
         self.overwrite_tags("***", "<strong>", "</strong>", true);
         self.overwrite_tags("*", "<em>", "</em>", true);
-        self.overwrite_tags("\n\n", "<br>", "", false);
-        self.overwrite_tags("\n", "\n", "\n", false);
+        self.overwrite_tags("\n\n", "\n<br>", "\n<br>", false);
+        self.overwrite_tags("\n", "\n", "\n<br>", false);
     }
 }
 
