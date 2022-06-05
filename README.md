@@ -86,7 +86,7 @@ If you need some help, you can use:
 
 ```
 cargo run help
-
 ```
+
 #### Contributing
 Feel free to contribute with the project, writing PRs, Issues, etc.
