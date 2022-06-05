@@ -3,6 +3,7 @@ use super::utils;
 use regex::Regex;
 use std::collections::HashMap;
 use std::fs;
+use std::path::Path;
 
 struct Replace {
     key: String,
@@ -39,7 +40,7 @@ impl BuildedPost {
 fn replace_config_variables(content: &str) -> String {
     let re: Regex = Regex::new(r"\{\{+\s?[A-Za-z-]+\s?\}\}").unwrap();
 
-    let config_file_content = utils::read_str_from_path(&"blog/config.json");
+    let config_file_content = fs::read_to_string(&"blog/config.json").unwrap();
 
     let configs = json::parse(&config_file_content).unwrap();
     let mut replaces_vec: Vec<Replace> = Vec::new();
@@ -102,7 +103,7 @@ fn replace_meta_variables(content: &str, _meta: &HashMap<&str, &str>) -> String 
 fn inject_css_theme(file_content: String) -> String {
     let mut result = String::from(file_content);
 
-    let configs = json::parse(&utils::read_str_from_path(&"blog/config.json")).unwrap();
+    let configs = json::parse(&fs::read_to_string(&"blog/config.json").unwrap()).unwrap();
 
     let mut theme_path = utils::path_from_string("themes/");
     let _ = &theme_path.push(configs["theme"].as_str().unwrap());
@@ -135,7 +136,7 @@ fn build_posts_feed(posts: Vec<BuildedPost>) -> Result<(), std::io::Error> {
         posts_feed_buffer.push_str("\n\n")
     }
 
-    let index_file = utils::read_str_from_path(&"blog/build/index.html");
+    let index_file = fs::read_to_string(&"blog/build/index.html")?;
 
     let index_with_feed = index_file.replace("<posts-feed>", &posts_feed_buffer);
 
@@ -152,15 +153,23 @@ fn build_posts_feed(posts: Vec<BuildedPost>) -> Result<(), std::io::Error> {
  * and translating the markdown content to html
  */
 pub fn run_command() -> Result<(), std::io::Error> {
-    let mut index_file_content = utils::read_str_from_path(&"blog/index-template.html");
+    let mut index_file_content = fs::read_to_string(&"blog/index-template.html")?;
     index_file_content = inject_css_theme(index_file_content);
+
+    if !Path::new(&"blog/build").exists() {
+        fs::create_dir("blog/build").unwrap();
+    }
+
+    if !Path::new(&"blog/build/posts").exists() {
+        fs::create_dir("blog/build/posts").unwrap();
+    }
 
     fs::write(
         utils::path_from_string(&"blog/build/index.html"),
         replace_config_variables(&index_file_content),
     )?;
 
-    let posts_files = fs::read_dir(utils::path_from_string(&"blog/posts/"))?;
+    let posts_files = fs::read_dir("blog/posts/")?;
 
     let mut posts_feed: Vec<BuildedPost> = Vec::new();
 
@@ -170,7 +179,7 @@ pub fn run_command() -> Result<(), std::io::Error> {
         let md_content = fs::read_to_string(&post.path())?;
         let md_meta = md_parser::extract_meta(&md_content);
 
-        let html_post_template = utils::read_str_from_path(&"blog/post-template.html");
+        let html_post_template = fs::read_to_string(&"blog/post-template.html")?;
 
         let html_with_post_content =
             html_post_template.replace("<md-content>", &md_parser::parse_string(&md_content));
