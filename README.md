@@ -27,7 +27,7 @@ post-template.html   -> The template for posts page
 #### Configs - `config.json`
 Here we can configure some variables and infos about the blog, you can add or remove any key and set any value you want. The only required key is the `theme` wich will be used to resolve your blog css theme:
 
-```json
+```
 config.json
 
 "theme": "dark.css" \\ this is the default theme, you can modify it or create others
@@ -35,7 +35,7 @@ config.json
 
 lets add another variable, now i want a one to handle my blog name:
 
-```json
+```
 config.json
 
 "theme": "dark.css"
@@ -47,7 +47,7 @@ After configuring the `config.json`, we can use this variables on templates:
 #### Templates
 To use variables iniside our templates and posts, we can use the variable notation: `{{ variable-key }}`:
 
-```html
+```
 index-template.html
 
 <div class="navbar">{{ blog-name }}</div>
