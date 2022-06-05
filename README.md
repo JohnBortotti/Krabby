@@ -45,6 +45,10 @@ config.json
 After configuring the `config.json`, we can use this variables on templates:
 
 #### Templates
+* index-template.html - the index page of blog, edit as you want, but don't remove the tag `<posts-feed>` wich is used to inject the posts inside page
+* post-template.html - the template for your posts, edit as you want, but don't remove the tag `<md-content>` wich is used to inject the builded markdown content inside the page
+
+
 To use variables iniside our templates and posts, we can use the variable notation: `{{ variable-key }}`:
 
 ```
