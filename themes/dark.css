@@ -57,6 +57,30 @@ html {
   font-family: sans-serif;
 }
 
+h1 {
+  font-size: 2.3rem;
+}
+
+h2 {
+  font-size: 2rem;
+}
+
+h3 {
+  font-size: 1.7rem;
+}
+
+h4 {
+  font-size: 1.4rem;
+}
+
+strong {
+  font-weight: bold;
+}
+
+em {
+  font-style: italic;
+}
+
 a {
   text-decoration: none;
   color: white;
@@ -101,6 +125,20 @@ a {
   color: gray;
 }
 
+.footer {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 0 auto;
+  font-size: 0.9rem;
+  margin: 20px 0px;
+  bottom: 0;
+}
+
+.footer a {
+  color: gray;
+}
+
 /*
  * CSS For post page
  */
@@ -120,20 +158,6 @@ a {
 }
 
 .post-content-description {
-  color: gray;
-}
-
-.footer {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  margin: 0 auto;
-  font-size: 0.9rem;
-  position: fixed;
-  bottom: 25px;
-}
-
-.footer a {
   color: gray;
 }
 
