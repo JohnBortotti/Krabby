@@ -1,5 +1,6 @@
 use super::md_parser;
 use super::utils;
+use chrono::NaiveDate;
 use regex::Regex;
 use std::collections::HashMap;
 use std::fs;
@@ -119,18 +120,21 @@ fn inject_css_theme(file_content: String) -> String {
 /*
  * insert into index.html all builded posts (posts feed)
  */
-fn build_posts_feed(posts: Vec<BuildedPost>) -> Result<(), std::io::Error> {
+fn build_posts_feed(mut posts: Vec<BuildedPost>) -> Result<(), std::io::Error> {
     let mut posts_feed_buffer = String::new();
+
+    posts.sort_by_key(|a| NaiveDate::parse_from_str(&a.date as &str, "%d-%m-%Y").unwrap());
+    posts.reverse();
 
     for post in posts {
         posts_feed_buffer.push_str(&format!(
             "<div class='post-card'>
-  <div class='post-title'>
-  <a href={}>{}</a>
-  </div>
-  <div class='post-date'>{}</div>
-  <div class='post-description'>{}</div>
-</div>",
+      <div class='post-title'>
+      <a href={}>{}</a>
+      </div>
+      <div class='post-date'>{}</div>
+      <div class='post-description'>{}</div>
+    </div>",
             post.href, post.title, post.date, post.description
         ));
         posts_feed_buffer.push_str("\n\n")
