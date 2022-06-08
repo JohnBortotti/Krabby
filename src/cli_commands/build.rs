@@ -1,10 +1,14 @@
 use super::md_parser;
 use super::utils;
 use chrono::NaiveDate;
+use comrak::markdown_to_html;
 use regex::Regex;
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
+
+extern crate comrak;
+use comrak::ComrakOptions;
 
 struct Replace {
     key: String,
@@ -185,8 +189,10 @@ pub fn run_command() -> Result<(), std::io::Error> {
 
         let html_post_template = fs::read_to_string("blog/post-template.html")?;
 
-        let html_with_post_content =
-            html_post_template.replace("<md-content>", &md_parser::parse_string(&md_content));
+        let html_with_post_content = html_post_template.replace(
+            "<md-content>",
+            &markdown_to_html(&md_content, &ComrakOptions::default()),
+        );
 
         let mut builded_post = replace_config_variables(&html_with_post_content);
         builded_post = replace_meta_variables(&builded_post, &md_meta);
