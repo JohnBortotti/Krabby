@@ -7,6 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="css/style.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/default.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
   <script>hljs.highlightAll();</script>
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
@@ -26,8 +27,14 @@
   </nav>
 
   <div class="post-content">
+    <div class="post-content-title-wrapper">
+      <h1 class="post-content-title">{{title}}</h1>
+      <a class="share-post-bnt" target="_blank"
+        href="https://twitter.com/share?url={{blog-url}}/posts/{{post-file}}&text={{title}}&via={{twitter-user}}">
+        <i class="material-icons">ios_share</i>
+      </a>
+    </div>
 
-    <h1 class="post-content-title">{{title}}</h1>
     <div class="post-content-date">{{date}}</div>
     <div class="post-content-description">{{description}}</div>
 

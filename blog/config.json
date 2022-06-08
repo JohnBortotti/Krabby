@@ -1,5 +1,7 @@
 {
-  "blog-name": "Rust SSG",
+  "blog-name": "Maybe Krabby?",
   "author": "John Bortotti",
-  "theme": "dark.css"
+  "theme": "dark.css",
+  "blog-url": "blog url here",
+  "twitter-user": "you twitter user for share post button"
 }
