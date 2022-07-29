@@ -1,5 +1,5 @@
 # Krabby
-Krabby is a minimalistic static blog generator written in Rust.
+Krabby is a minimalistic static blog generator written in Rust. (WIP)
 
 ## How to install
 Just clone this repo
