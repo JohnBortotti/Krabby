@@ -1,12 +1,12 @@
-pub fn run_command() -> Result<(), std::io::Error> {
+pub fn run() -> Result<(), std::io::Error> {
     print!(
         "
-------- Rust-sbg Help ------ 
+------- Krabby Help ------ 
 
-build                 -> build all files to '/build'
+init                  -> Create a new krabby project 
 help                  -> show this help
 
-for more info         -> https://github.com/JohnBortotti/ssg-rust
+more info             -> https://github.com/JohnBortotti/Krabby
 ----------------------------
 
 "
