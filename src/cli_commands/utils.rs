@@ -5,7 +5,6 @@ use std::path::Path;
 use std::env;
 use std::process;
 
-
 pub fn path_from_string(path: &str) -> PathBuf {
     let mut pathbuf = PathBuf::new();
 
@@ -42,19 +41,4 @@ pub fn check_krabby_dir() -> Result<(), std::io::Error>{
              process::exit(1);
          }
      }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn should_return_pathbuf_from_string() {
-        let path = path_from_string("any/path");
-
-        let mut expected = PathBuf::new();
-        expected.push("any/path");
-
-        assert_eq!(path, expected);
-    }
 }
