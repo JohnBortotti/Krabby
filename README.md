@@ -8,88 +8,53 @@ git clone https://github.com/JohnBortotti/Krabby.git
 ```
 
 ## How to use
-#### Files
-After clonning the repo, we have:
-```
-blog/        -> Here is your blog with file configs, html templates and markdown posts
-src/         -> Krabby source code (feel free to explore and contribute to the project)
-themes/      -> CSS themes, you can use the default themes or create you owns here
-```
-Inside the `/blog`:
-```
-build/               -> Builded files, just drop this files inside your web server
-posts/               -> All your markdown posts
-config.json          -> Blog configs
-index-template.html  -> The template for index.html page
-post-template.html   -> The template for posts page
-```
-
-#### Configs - `config.json`
-Here we can configure some variables and infos about the blog, you can add or remove any key and set any value you want. The only required key is the `theme` wich will be used to resolve your blog css theme:
-
-```
-config.json
-
-"theme": "dark.css" \\ this is the default theme, you can modify it or create others
-```
-
-lets add another variable, now i want a one to handle my blog name:
-
-```
-config.json
-
-"theme": "dark.css"
-"blog-name": "Rust Krabby" \\ i can set any key and any value here, and use later on templates
-```
-
-After configuring the `config.json`, we can use this variables on templates:
-
-#### Templates
-* index-template.html - the index page of blog, edit as you want, but don't remove the tag `<posts-feed>` wich is used to inject the posts inside page
-* post-template.html - the template for your posts, edit as you want, but don't remove the tag `<md-content>` wich is used to inject the builded markdown content inside the page
-
-
-To use variables iniside our templates and posts, we can use the variable notation: `{{ variable-key }}`:
-
-```
-index-template.html
-
-<div class="navbar">{{ blog-name }}</div>
-```
-
-After the build step, the variable will be replaced with the value daclared on config.json. And clearly you can use the same for `post-template.html` and any post markdown on `blog/posts`.
-
-#### Posts
-To create a new post, just create a new markdown file at `blog/posts` like this:
-
-```
-example-post.md
-
-<!-- md-meta
-title: Example post           (required key)
-description: Any description  (required key)
-date: 1-1-2077                (required key)
-hello: world
-(here you can add any other keys, like config.json but specific for each post, like tags, author, ...)
--->
-
-Write your post here
-
-{{ blog-name }} \\ use variables the same way, you can use variables both from config.json than from meta header 
-{{ hello }} 
-
-```
 
 #### Commands
-Finally, after setup your configs, and posts, you will need to build the blog:
+```
+init {project_name} -> creates a new Krabby project
+post {post_name}    -> creates a new Post
+build               -> build project
+help                -> show this help
+```
+
+#### Project 
+After creating a new Krabby project, the following structure will be created:
+```
+index-template.html -> blog index page template
+krabby-config.json  -> configs
+posts/              -> posts dir
+post-template.html  -> blog post page template
+style.css           -> blog css
 
 ```
-cargo run build
-```
-If you need some help, you can use:
 
+
+#### Variables
+You can create and set some variables wich will be replaced in the html files at building stage,
+you can define global variables (used throught all the blog), or post scoped variables, wich are used only
+inside the post.
+
+Defining global variables, inside krabby-config.json:
 ```
-cargo run help
+"author": "John Bortoti" -> setting a new value
+"hello": "world" -> creatign a new variable
+```
+
+Defining post variables, inside post markdown:
+```
+title: Example post           
+description: Any description  
+date: 1-1-2077               
+hello: world
+```
+
+#### Using variables
+Using variables is pretty straightforward, using the notation:
+```{variable_key}```
+
+example:
+```
+hello, my name is {author}, and the blog name is {blog-name}
 ```
 
 #### Contributing
