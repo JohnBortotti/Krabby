@@ -37,7 +37,7 @@ inside the post.
 Defining global variables, inside krabby-config.json:
 ```
 "author": "John Bortoti" -> setting a new value
-"hello": "world" -> creatign a new variable
+"hello": "world" -> creating a new variable
 ```
 
 Defining post variables, inside post markdown:
