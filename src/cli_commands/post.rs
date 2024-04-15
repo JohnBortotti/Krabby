@@ -11,7 +11,7 @@ pub fn run(title: &str) -> Result<(), std::io::Error> {
     let mut post_md = File::create(Path::new("./").join("posts").join(&title.to_lowercase()).with_extension("md"))?;
 
     let buff = format!(
-        "<!-- md-meta \n title: {} \n description: Description here \n date: {} \n post-file: {}.html \n--> \n\n",
+        "<!-- md-meta\ntitle: {}\ndescription: Description here\ndate: {}\npost-file: {}.html\n-->\n\n",
         title, Utc::now().format("%Y-%m-%d"), title);
 
     post_md.write_all(buff.as_bytes())?;
