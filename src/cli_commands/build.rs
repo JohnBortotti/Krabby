@@ -2,7 +2,7 @@ use crate::cli_commands::utils;
 use std::path::Path;
 use std::fs;
 use std::collections::HashMap;
-use regex;
+use regex::Regex;
 use chrono::NaiveDate;
 use comrak::ComrakOptions;
 use comrak::markdown_to_html;
@@ -20,21 +20,19 @@ struct Post {
 }
 
 pub fn replace_vars(content: &str, vars_table: &HashMap<String, String>, verbose: bool) -> String {
-    let re: regex::Regex = regex::Regex::new(r"\{\{+\s?[A-Za-z-]+\s?\}\}").unwrap();
-
+    let re = Regex::new(r"\{\s*[A-Za-z0-9_-]+\s*\}").unwrap();
     let mut replaces: Vec<Replace> = Vec::new();
 
     for captures in re.captures_iter(&content) {
-        let var_def = captures.get(0).unwrap().as_str();
-        let key = var_def.replace("{", "").replace("}", "").replace(" ", "");
+        let var_template = captures.get(0).unwrap().as_str();
+        let key = var_template.replace("{", "").replace("}", "").replace(" ", "");
 
         let var_value = match vars_table.get(&key) {
             Some(a) => a,
             None => { if verbose { println!("Krabby Alert: variable '{}' not found", key)}; continue },
         };
 
-        replaces.push(Replace { key: var_def.to_string(), value: var_value.to_string() });
-
+        replaces.push(Replace { key: var_template.to_string(), value: var_value.to_string() });
     }
 
     let mut result = String::from(content);
@@ -46,16 +44,13 @@ pub fn replace_vars(content: &str, vars_table: &HashMap<String, String>, verbose
     result
 }
 
-fn extract_config() -> HashMap<String, String> {
-    let config_file_content = fs::read_to_string("krabby-config.json").unwrap();
-    let configs = json::parse(&config_file_content).unwrap();
-    let mut map = HashMap::new();
-
-    for config in configs.entries() {
-        map.insert(String::from(config.0), String::from(config.1.as_str().unwrap()));
-    }
-
-    map
+fn extract_config(input: json::JsonValue) -> HashMap<String, String> {
+    input
+        .entries()
+        .filter_map(|(key, value)| {
+            value.as_str().map(|v| (key.to_string(), v.to_string()))
+        })
+    .collect()
 }
 
 fn extract_meta(input: &str) -> HashMap<String, String> {
@@ -76,10 +71,9 @@ fn extract_meta(input: &str) -> HashMap<String, String> {
     meta
 }
 
-fn build_posts() -> Result<Vec<Post>, std::io::Error> {
+fn build_posts(config_vars: HashMap<String, String>) -> Result<Vec<Post>, std::io::Error> {
     let posts_files = fs::read_dir("posts")?;
     let mut posts = vec![];
-    let config_vars = extract_config();
 
     for post in posts_files {
         let post = post?;
@@ -153,7 +147,11 @@ pub fn run() -> Result<(), std::io::Error> {
 
     std::fs::copy("style.css", "build/style.css")?;
 
-    let posts = build_posts()?;
+    let config_file = fs::read_to_string("krabby-config.json").unwrap();
+    let config_json = json::parse(&config_file).unwrap();
+    let vars_map = extract_config(config_json);
+
+    let posts = build_posts(vars_map)?;
     let feed = build_feed(posts)?;
 
     let mut index_template = fs::read_to_string("index-template.html")?;
@@ -168,4 +166,54 @@ pub fn run() -> Result<(), std::io::Error> {
     fs::write(&builded_path, index_template)?;
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_replace_vars() {
+        let content = "hello {var_1} {var_2}";
+        let mut vars: HashMap<String, String> = HashMap::new();
+        vars.insert(String::from("var_1"), String::from("world"));
+
+        let output = replace_vars(&content, &vars, true);
+
+        assert_eq!(output, "hello world {var_2}");
+    }
+
+    #[test]
+    fn test_extract_config() {
+        let json = json::parse("{\"var_1\": \"world\", \"var_2\": \"hello\"}").unwrap();
+
+        assert_eq!(
+            extract_config(json), 
+            HashMap::from([
+              ("var_1".to_string(), "world".to_string()),
+              ("var_2".to_string(), "hello".to_string())
+            ])
+        )
+    }
+
+    #[test]
+    fn test_extract_meta() {
+        let input = "<!-- md-meta
+title: Example post
+description: Any description
+hello: world
+-->
+";
+
+        assert_eq!(
+            extract_meta(input), 
+            HashMap::from([
+              ("title".to_string(), "Example post".to_string()),
+              ("description".to_string(), "Any description".to_string()),
+              ("hello".to_string(), "world".to_string())
+            ])
+        )
+
+    }
+
 }
