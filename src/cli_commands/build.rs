@@ -81,7 +81,6 @@ fn build_posts(config_vars: HashMap<String, String>) -> Result<Vec<Post>, std::i
         let content = fs::read_to_string(&post.path())?;
         let md_meta = extract_meta(&content);
 
-        // TODO: get template from meta var (each post can select a specific template)
         let mut post_template = fs::read_to_string("templates/post-template.html")?;
         
         post_template = post_template.replace(
