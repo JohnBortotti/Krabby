@@ -37,7 +37,7 @@ pub fn check_krabby_dir() -> Result<(), std::io::Error>{
      match File::open(path) {
          Ok(_) => Ok(()),
          Err(_) => {
-             println!("Error: Invalid Krabby project \n");
+             println!("Error: Invalid Krabby project, check you current directory");
              process::exit(1);
          }
      }

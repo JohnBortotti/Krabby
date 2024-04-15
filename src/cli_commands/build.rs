@@ -3,7 +3,6 @@ use std::path::Path;
 use std::fs;
 use std::collections::HashMap;
 use regex;
-use chrono::NaiveDate;
 use comrak::ComrakOptions;
 use comrak::markdown_to_html;
 
@@ -118,34 +117,9 @@ fn build_posts() -> Result<Vec<Post>, std::io::Error> {
     Ok(posts)
 }
 
-fn build_post_feed(mut posts: Vec<Post>) -> Result<String, std::io::Error> {
-    let mut post_feed = String::new();
-
-    posts.sort_by_key(|a| NaiveDate::parse_from_str(&a.date as &str, "%d-%m-%Y").unwrap());
-    posts.reverse();
-
-    for post in posts {
-        post_feed.push_str(&format!(
-            "<div class='post-card'>
-      <div class='post-title'>
-      <a href={}>{}</a>
-      </div>
-      <div class='post-date'>{}</div>
-      <div class='post-description'>{}</div>
-    </div>",
-            post.href, post.title, post.date, post.description
-        ));
-        post_feed.push_str("\n\n")
-    }
-
-    Ok(post_feed)
-}
-
-
 pub fn run() -> Result<(), std::io::Error> {
     utils::check_krabby_dir()?;
     
-    // create build dirs
     if !Path::new("build").exists() {
         fs::create_dir("build").unwrap();
     }
@@ -154,9 +128,9 @@ pub fn run() -> Result<(), std::io::Error> {
         fs::create_dir("build/posts").unwrap();
     }
 
-    std::fs::copy("style.css", "build/style.css");
+    std::fs::copy("style.css", "build/style.css")?;
 
-    let posts_files = build_posts();
+    build_posts()?;
 
     Ok(())
 }

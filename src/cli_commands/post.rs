@@ -16,5 +16,7 @@ pub fn run(title: &str) -> Result<(), std::io::Error> {
 
     post_md.write_all(buff.as_bytes())?;
 
+    println!("Krabby post created: {}", title);
+
     Ok(())
 }

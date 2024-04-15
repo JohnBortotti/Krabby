@@ -6,7 +6,7 @@ pub fn run(project_name: &str) -> Result<(), std::io::Error> {
     target_path.push(project_name);
 
     copy_full_dir("template", target_path)?;
-    println!("project created: {}", project_name);
+    println!("Krabby project created: {}", project_name);
 
     Ok(())
 }
