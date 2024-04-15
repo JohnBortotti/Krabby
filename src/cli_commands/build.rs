@@ -82,7 +82,7 @@ fn build_posts(config_vars: HashMap<String, String>) -> Result<Vec<Post>, std::i
         let md_meta = extract_meta(&content);
 
         // TODO: get template from meta var (each post can select a specific template)
-        let mut post_template = fs::read_to_string("post-template.html")?;
+        let mut post_template = fs::read_to_string("templates/post-template.html")?;
         
         post_template = post_template.replace(
             "<md-content>",
@@ -155,7 +155,7 @@ pub fn run() -> Result<(), std::io::Error> {
     let posts = build_posts(vars_map)?;
     let feed = build_feed(posts)?;
 
-    let mut index_template = fs::read_to_string("index-template.html")?;
+    let mut index_template = fs::read_to_string("templates/index-template.html")?;
     index_template = index_template.replace(
         "<posts-feed>",
         &feed,
