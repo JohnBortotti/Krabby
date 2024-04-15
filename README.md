@@ -26,8 +26,8 @@ posts/              -> posts dir
 post-template.html  -> blog post page template
 style.css           -> blog css
 
+build/              -> builded blog (created on first build)
 ```
-
 
 #### Variables
 You can create and set some variables wich will be replaced in the html files at building stage,
