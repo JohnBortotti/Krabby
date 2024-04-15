@@ -81,6 +81,7 @@ fn build_posts(config_vars: HashMap<String, String>) -> Result<Vec<Post>, std::i
         let content = fs::read_to_string(&post.path())?;
         let md_meta = extract_meta(&content);
 
+        // TODO: get template from meta var (each post can select a specific template)
         let mut post_template = fs::read_to_string("post-template.html")?;
         
         post_template = post_template.replace(
@@ -115,7 +116,7 @@ fn build_posts(config_vars: HashMap<String, String>) -> Result<Vec<Post>, std::i
 fn build_feed(mut posts: Vec<Post>) -> Result<String, std::io::Error> {
     let mut feed = String::new();
 
-    posts.sort_by_key(|a| NaiveDate::parse_from_str(&a.date as &str, "%d-%m-%Y").unwrap());
+    posts.sort_by_key(|a| NaiveDate::parse_from_str(&a.date as &str, "%Y-%m-%d").unwrap());
     posts.reverse();
 
     for post in posts {
