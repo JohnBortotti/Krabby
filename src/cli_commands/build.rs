@@ -3,6 +3,7 @@ use std::path::Path;
 use std::fs;
 use std::collections::HashMap;
 use regex;
+use chrono::NaiveDate;
 use comrak::ComrakOptions;
 use comrak::markdown_to_html;
 
@@ -117,6 +118,28 @@ fn build_posts() -> Result<Vec<Post>, std::io::Error> {
     Ok(posts)
 }
 
+fn build_feed(mut posts: Vec<Post>) -> Result<String, std::io::Error> {
+    let mut feed = String::new();
+
+    posts.sort_by_key(|a| NaiveDate::parse_from_str(&a.date as &str, "%d-%m-%Y").unwrap());
+    posts.reverse();
+
+    for post in posts {
+        feed.push_str(&format!("<div class='post-card'>
+  <div class='post-title'>
+   <a href={}>{}</a>
+  </div>
+  <div class='post-date'>{}</div>
+  <div class='post-description'>{}</div>
+</div>\n\n",
+                post.href, post.title, post.date, post.description
+                )
+            );
+    }
+
+    Ok(feed)
+}
+
 pub fn run() -> Result<(), std::io::Error> {
     utils::check_krabby_dir()?;
     
@@ -130,7 +153,19 @@ pub fn run() -> Result<(), std::io::Error> {
 
     std::fs::copy("style.css", "build/style.css")?;
 
-    build_posts()?;
+    let posts = build_posts()?;
+    let feed = build_feed(posts)?;
+
+    let mut index_template = fs::read_to_string("index-template.html")?;
+    index_template = index_template.replace(
+        "<posts-feed>",
+        &feed,
+    );
+    let mut builded_path = utils::path_from_string("build");
+    builded_path.push("index");
+    builded_path.set_extension("html");
+
+    fs::write(&builded_path, index_template)?;
 
     Ok(())
 }
